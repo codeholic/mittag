@@ -1,18 +1,5 @@
-<!DOCTYPE html>
 % my $dow = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>Tagesangebote: <%= $date->dmy('.') %></title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1"> 
-
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0-rc.1/jquery.mobile-1.2.0-rc.1.min.css" />
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.1.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/mobile/1.2.0-rc.1/jquery.mobile-1.2.0-rc.1.min.js"></script>
-  </head>
-
-  <body>
+% layout 'page', title => 'Tagesangebote: ' . $date->dmy('.');
     <div data-role="page">
       <div data-role="header">
         <% if ($prev_date) { %><a href="/day/<%= $prev_date->ymd('-') %>" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-transition="slide" data-direction="reverse">[&lt;&lt;]</a><% } %>
@@ -38,6 +25,3 @@
         <p>Alle Angaben ohne Gew&auml;hr! Fehler, Kommentare, neue Restaurants und Mithilfe gern an <a href="mailto:uwe@uwevoelker.de">uwe@uwevoelker.de</a></p>
       </div>
     </div>
-
-  </body>
-</html>
