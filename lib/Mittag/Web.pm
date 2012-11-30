@@ -1,6 +1,6 @@
 package Mittag::Web;
 
-use FindBin;
+use Cwd 'realpath';
 use Mojo::Base 'Mojolicious';
 
 use Mittag::Config;
@@ -8,7 +8,7 @@ use Mittag::DB::Schema;
 
 
 has schema => sub {
-    my $config = Mittag::Config->new($FindBin::Bin . '/..');
+    my $config = Mittag::Config->new(realpath(__FILE__ . '/../../..'));
     Mittag::DB::Schema->connect_with_config($config);
 };
 
