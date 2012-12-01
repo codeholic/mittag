@@ -1,16 +1,15 @@
-% my $title = 'Umfragen';
+% my $title = 'Deine Umfragen';
 % layout 'page', title => $title;
 <div data-role="page" data-title="<%= $title %>">
   <div data-role="header">
     <a href="/" data-role="button" data-icon="home" data-iconpos="notext" data-transition="slide" data-direction="reverse">Zur Startseite</a>
-    <h1>Umfragen</h1>
+    <h1>Deine Umfragen</h1>
   </div>
 
   <div data-role="content">
-    <a href="/appointments/new" data-role="button" data-icon="add" data-iconpos="left">Neue Umfrage</a>
+    <a href="/appointments/new" data-role="button" data-icon="add" data-iconpos="left" data-theme="b">Neue Umfrage</a>
 % if (@$appointments) {
     <ul data-role="listview" data-inset="true">
-      <li data-role="list-divider">Deine Umfragen</li>
 %   foreach my $appointment (@$appointments) {
       <li><a href="/appointments/<%= $appointment->id %>"><%= $appointment->date->dmy('.') %></a></li>
 %   }

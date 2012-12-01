@@ -9,7 +9,7 @@
   <div data-role="content">
     <form action="/appointments" data-ajax="false" method="post">
       <input type="text" name="date" value="<%= $current_date->ymd('-') %>"/>
-      <input type="submit" value="Fertig"/>
+      <input type="submit" value="Fertig" data-icon="check" data-theme="b"/>
     </form>
   </div>
 </div>
