@@ -1,8 +1,37 @@
 % my $title = $appointment->date->dmy('.');
 % layout 'page', title => $title;
-<div data-role="page" data-title="<%= $title %>">
+<div id="appointment" data-role="page" data-title="<%= $title %>">
+  <script>
+$('#appointment').live('pageinit', function(){
+  $('input[type=checkbox]').click(function(){
+    var form = $(this).closest('form');
+    var action = form.attr('action');
+    $.post(action, form.serialize(), function(){
+      var newAction = action.replace(/\/delete$/, '');
+      if (newAction == action) {
+        newAction += '/delete';
+      }
+      form.attr('action', newAction);
+    });
+  });
+});
+  </script>
   <div data-role="header">
     <a href="/appointments" data-role="button" data-icon="back" data-iconpos="notext" data-transition="slide" data-direction="reverse">Zurück</a>
     <h1><%= $title %></h1>
+  </div>
+  <div data-role="content">
+    <ul data-role="listview">
+% foreach my $entry (@$entries) {
+      <li>
+        <form action="/appointments/<%= $appointment->id %>/votes/<%= $entry->{place}->id . ( $entry->{exists} ? '/delete' : '' ) %>" data-ajax="false" method="post">
+          <label>
+            <input type="checkbox"<% if ($entry->{exists}) { %> checked="checked"<% } %>/>
+            <%= $entry->{place}->name %>
+          </label>
+        </form>
+      </li>
+% }
+    </ul>
   </div>
 </div>

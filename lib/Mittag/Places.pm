@@ -24,5 +24,9 @@ sub place_by_id {
     return $place{$id};
 }
 
+sub all {
+    my ($class) = @_;
+    return values %place;
+}
 
 1;

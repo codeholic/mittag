@@ -13,5 +13,6 @@ __PACKAGE__->uuid_class('Mittag::DB::UUIDGenerator');
 __PACKAGE__->uuid_columns('id');
 
 has_many participations => 'Mittag::DB::Schema::Participation', 'appointment_id';
+has_many votes          => 'Mittag::DB::Schema::Vote',          'appointment_id';
 
 1;

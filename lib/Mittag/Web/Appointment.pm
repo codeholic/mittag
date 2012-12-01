@@ -4,6 +4,8 @@ use Mojo::Base 'Mojolicious::Controller';
 
 use DateTime;
 
+use Mittag::Places;
+
 sub index {
     my ($self) = @_;
 
@@ -49,11 +51,86 @@ sub show {
         $self->authenticate;
     }
 
+    my $current_user = $self->current_user;
+
     $appointment->find_or_create_related(participations => {
-        user => $self->current_user,
+        user => $current_user,
     });
 
-    $self->stash(appointment => $appointment);
+    my @places = sort { $a->name cmp $b->name } Mittag::Places->all;
+
+    my %own_votes = map { $_->place_id => 1 } $appointment->search_related(votes => {
+        user_id => $current_user->id,
+    });
+
+    my @entries;
+    foreach my $place (@places) {
+        push @entries, {
+            place  => $place,
+            exists => $own_votes{$place->id},
+        };
+    }
+
+    $self->stash(
+        appointment => $appointment,
+        entries     => \@entries,
+    );
+}
+
+sub vote {
+    my ($self) = @_;
+
+    my $place = Mittag::Places->place_by_id($self->param('place_id'));
+    if (!$place) {
+        return $self->render_not_found;
+    }
+
+    my $appointment = $self->app->rs('Appointment')->find($self->param('id'));
+    if (!$appointment) {
+        return $self->render_not_found;
+    }
+
+    if (!$self->is_user_authenticated) {
+        $self->authenticate;
+    }
+
+    my $current_user = $self->current_user;
+
+    $appointment->find_or_create_related(votes => {
+        user     => $current_user,
+        place_id => $place->id,
+    });
+
+    $self->res->code(204);
+    $self->render(text => '');
+}
+
+sub unvote {
+    my ($self) = @_;
+
+    my $place = Mittag::Places->place_by_id($self->param('place_id'));
+    if (!$place) {
+        return $self->render_not_found;
+    }
+
+    my $appointment = $self->app->rs('Appointment')->find($self->param('id'));
+    if (!$appointment) {
+        return $self->render_not_found;
+    }
+
+    if (!$self->is_user_authenticated) {
+        $self->authenticate;
+    }
+
+    my $current_user = $self->current_user;
+
+    my $vote = $appointment->delete_related(votes => {
+        user_id  => $current_user->id,
+        place_id => $place->id,
+    });
+
+    $self->res->code(204);
+    $self->render(text => '');
 }
 
 1;
