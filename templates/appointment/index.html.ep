@@ -1,0 +1,12 @@
+% my $title = 'Umfragen';
+% layout 'page', title => $title;
+<div data-role="page" data-title="<%= $title %>">
+  <div data-role="header">
+    <a href="/" data-role="button" data-icon="home" data-iconpos="notext" data-transition="slide" data-direction="reverse">Zur Startseite</a>
+    <h1>Umfragen</h1>
+  </div>
+
+  <div data-role="content">
+    <a href="/appointments/new" data-role="button" data-icon="add" data-iconpos="left">Neue Umfrage</a>
+  </div>
+</div>

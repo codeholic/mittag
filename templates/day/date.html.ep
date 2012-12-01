@@ -1,6 +1,7 @@
 % my $dow = ['', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
-% layout 'page', title => 'Tagesangebote: ' . $date->dmy('.');
-    <div data-role="page">
+% my $title = 'Tagesangebote: ' . $date->dmy('.');
+% layout 'page', title => $title;
+    <div data-role="page" data-title="<%= $title %>">
       <div data-role="header">
         <% if ($prev_date) { %><a href="/day/<%= $prev_date->ymd('-') %>" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-transition="slide" data-direction="reverse">[&lt;&lt;]</a><% } %>
         <h1><%= $dow->[$date->dow] %>, <%= $date->dmy('.') %></h1>

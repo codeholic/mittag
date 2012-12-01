@@ -54,15 +54,14 @@ sub startup {
 
     my $r = $self->routes;
 
-    $r->route('/'         )->to('day#today');
-    $r->route('/day'      )->to('day#today');
-    $r->route('/day/:date')->to('day#date')->name('day');
-    $r->route('/day/today')->to('day#date')->name('today');
+    $r->get('/'         )->to('day#today');
+    $r->get('/day'      )->to('day#today');
+    $r->get('/day/:date')->to('day#date')->name('day');
+    $r->get('/day/today')->to('day#date')->name('today');
 
-    $r->route('/place/:id')->to('place#show');
+    $r->get('/place/:id')->to('place#show');
 
-    # compatibility with old mobile URLs
-    $r->route('/day/:date/1')->to('day#date');
+    $r->get('/appointments')->to('appointment#index');
 }
 
 
