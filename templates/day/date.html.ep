@@ -15,7 +15,7 @@
 % foreach my $offer (@$OFFERS) {
 %     if ($offer->place->name ne $last_place) {
 %         $last_place = $offer->place->name;
-          <li data-role="list-divider"><div><a href="/place/<%= $offer->place_id %>" data-role="button" data-icon="info" data-theme="b" rel="external"><%= $offer->place->name %></a></div></li>
+          <li data-role="list-divider"><div><a href="/places/<%= $offer->place_id %>" data-role="button" data-icon="info" data-theme="b" rel="external"><%= $offer->place->name %></a></div></li>
 %     }
           <li><%= $offer->name %> <span class="ui-li-count"><%= format_price($offer->price) %> &euro;</span></li>
 % }

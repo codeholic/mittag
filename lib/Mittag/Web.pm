@@ -59,7 +59,7 @@ sub startup {
     $r->get('/day/:date')->to('day#date')->name('day');
     $r->get('/day/today')->to('day#date')->name('today');
 
-    $r->get('/place/:id')->to('place#show');
+    $r->get('/places/:id')->to('place#show');
 
     $r->get('/appointments')->to('appointment#index');
 }
