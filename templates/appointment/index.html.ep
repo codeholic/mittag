@@ -8,5 +8,13 @@
 
   <div data-role="content">
     <a href="/appointments/new" data-role="button" data-icon="add" data-iconpos="left">Neue Umfrage</a>
+% if (@$appointments) {
+    <ul data-role="listview" data-inset="true">
+      <li data-role="list-divider">Deine Umfragen</li>
+%   foreach my $appointment (@$appointments) {
+      <li><a href="/appointments/<%= $appointment->id %>"><%= $appointment->date->dmy('.') %></a></li>
+%   }
+    </ul>
+% }
   </div>
 </div>
