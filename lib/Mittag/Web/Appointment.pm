@@ -32,6 +32,10 @@ sub show {
         return $self->render_not_found;
     }
 
+    $appointment->find_or_create_related(participations => {
+        user => $self->current_user,
+    });
+
     $self->stash(appointment => $appointment);
 }
 

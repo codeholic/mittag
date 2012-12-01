@@ -28,3 +28,9 @@ CREATE TABLE IF NOT EXISTS `appointment` (
   `date` date NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `participation` (
+  `user_id` int(10) unsigned NOT NULL,
+  `appointment_id` varchar(25) NOT NULL,
+  PRIMARY KEY (`user_id`, `appointment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
