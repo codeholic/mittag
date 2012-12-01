@@ -62,6 +62,7 @@ sub startup {
     $r->get('/places/:id')->to('place#show');
 
     $r->get('/appointments')->to('appointment#index');
+    $r->get('/appointments/new')->to('appointment#form');
 }
 
 

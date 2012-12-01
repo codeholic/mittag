@@ -1,0 +1,15 @@
+% my $title = 'Neue Umfrage';
+% layout 'page', title => $title;
+<div data-role="page" data-title="<%= $title %>">
+  <div data-role="header">
+    <a href="/appointments" data-role="button" data-icon="back" data-iconpos="notext" data-transition="slide" data-direction="reverse">Zurück</a>
+    <h1>Neue Umfrage</h1>
+  </div>
+
+  <div data-role="content">
+    <form action="/appointments" method="post">
+      <input type="text" name="date" value="<%= $current_date->ymd('-') %>"/>
+      <input type="submit" value="Fertig"/>
+    </form>
+  </div>
+</div>
