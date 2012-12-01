@@ -21,7 +21,7 @@ sub create {
     });
 
     $self->res->code(303);
-    $self->redirect_to('/appointments');
+    $self->redirect_to('/appointments/' . $appointment->id);
 }
 
 sub show {
