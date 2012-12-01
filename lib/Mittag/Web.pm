@@ -64,7 +64,7 @@ sub startup {
     $r->get('/appointments')->to('appointment#index');
     $r->get('/appointments/new')->to('appointment#form');
     $r->post('/appointments')->to('appointment#create');
-
+    $r->get('/appointments/:id')->to('appointment#show');
 }
 
 

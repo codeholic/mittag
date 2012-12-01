@@ -24,4 +24,15 @@ sub create {
     $self->redirect_to('/appointments');
 }
 
+sub show {
+    my ($self) = @_;
+
+    my $appointment = $self->app->rs('Appointment')->find($self->param('id'));
+    if (!$appointment) {
+        return $self->render_not_found;
+    }
+
+    $self->stash(appointment => $appointment);
+}
+
 1;

@@ -1,0 +1,8 @@
+% my $title = $appointment->date->dmy('.');
+% layout 'page', title => $title;
+<div data-role="page" data-title="<%= $title %>">
+  <div data-role="header">
+    <a href="/appointments" data-role="button" data-icon="back" data-iconpos="notext" data-transition="slide" data-direction="reverse">Zurück</a>
+    <h1><%= $title %></h1>
+  </div>
+</div>
