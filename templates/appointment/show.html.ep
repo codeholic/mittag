@@ -1,8 +1,9 @@
 % my $title = $appointment->date->dmy('.');
+% my $page_id = 'appointment-' . $appointment->id;
 % layout 'page', title => $title;
-<div id="appointment" data-role="page" data-title="<%= $title %>">
+<div id="<%= $page_id %>" data-role="page" data-title="<%= $title %>">
   <script>
-$('#appointment').live('pageinit', function(){
+$('#<%= $page_id %>').one('pageinit', function(){
   $('input[type=checkbox]').click(function(){
     var checkbox = $(this);
     var form = $(this).closest('form');
