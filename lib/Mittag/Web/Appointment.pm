@@ -6,6 +6,9 @@ use DateTime;
 
 use Mittag::Places;
 
+has 'appointment';
+has 'place';
+
 sub index {
     my ($self) = @_;
 
@@ -92,45 +95,39 @@ sub show {
 sub vote {
     my ($self) = @_;
 
-    my $place = Mittag::Places->place_by_id($self->param('place_id'));
-    if (!$place) {
-        return $self->render_not_found;
-    }
-
-    my $appointment = $self->app->rs('Appointment')->find($self->param('id'));
-    if (!$appointment) {
-        return $self->render_not_found;
-    }
-
-    if (!$self->is_user_authenticated) {
-        $self->authenticate;
-    }
-
-    my $current_user = $self->current_user;
-
-    $appointment->find_or_create_related(votes => {
-        user     => $current_user,
-        place_id => $place->id,
+    $self->_toggle_vote(sub {
+        $self->appointment->find_or_create_related(votes => {
+            user     => $self->current_user,
+            place_id => $self->place->id,
+        });
     });
 
-    my $total = $appointment->search_related(votes => {
-            place_id => $place->id,
-        })->count;
-
-    $self->res->code(200);
-    $self->render(json => { total => 0+ $total });
+    return;
 }
 
 sub unvote {
     my ($self) = @_;
 
-    my $place = Mittag::Places->place_by_id($self->param('place_id'));
-    if (!$place) {
+    $self->_toggle_vote(sub {
+        $self->appointment->delete_related(votes => {
+            user_id  => $self->current_user->id,
+            place_id => $self->place->id,
+        });
+    });
+
+    return;
+}
+
+sub _toggle_vote {
+    my ($self, $cb) = @_;
+
+    $self->place(Mittag::Places->place_by_id($self->param('place_id')));
+    if (!$self->place) {
         return $self->render_not_found;
     }
 
-    my $appointment = $self->app->rs('Appointment')->find($self->param('id'));
-    if (!$appointment) {
+    $self->appointment($self->app->rs('Appointment')->find($self->param('id')));
+    if (!$self->appointment) {
         return $self->render_not_found;
     }
 
@@ -138,15 +135,10 @@ sub unvote {
         $self->authenticate;
     }
 
-    my $current_user = $self->current_user;
+    $cb->();
 
-    my $vote = $appointment->delete_related(votes => {
-        user_id  => $current_user->id,
-        place_id => $place->id,
-    });
-
-    my $total = $appointment->search_related(votes => {
-            place_id => $place->id,
+    my $total = $self->appointment->search_related(votes => {
+            place_id => $self->place->id,
         })->count;
 
     $self->res->code(200);
