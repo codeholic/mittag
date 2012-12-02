@@ -1,0 +1,1 @@
+          <li><%= $offer->name %> <span class="ui-li-count"><%= format_price($offer->price) %> &euro;</span></li>

@@ -31,7 +31,7 @@ sub date {
         $date = $today;
     }
 
-    my @offers = $self->_get_offers($date);
+    my @offers = $self->app->offers->search({ date => $date });
 
     unless (@offers) {
         my $next_date = $self->_next_date($date, 1);
@@ -47,24 +47,6 @@ sub date {
         prev_date => $self->_prev_date($date->clone->subtract(days => 1)) || undef,
         next_date => $self->_next_date($date->clone->add(     days => 1)) || undef,
     );
-}
-
-# get daily and weekly offers (sorted by place and price)
-sub _get_offers {
-    my ($self, $date) = @_;
-
-    my @daily  = $self->app->rs('DailyOffer')->search({date => $date->ymd('-')});
-
-    return unless @daily;
-
-    my @weekly = $self->app->rs('WeeklyOffer')->search({
-        from_date => {'<=' => $date->ymd('-')},
-        to_date   => {'>=' => $date->ymd('-')},
-    });
-
-    my @offers = sort { $a->place->name cmp $b->place->name or $a->price <=> $b->price } (@daily, @weekly);
-
-    return @offers;
 }
 
 # same date or before

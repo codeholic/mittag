@@ -8,6 +8,7 @@ use Time::Seconds ();
 
 use Mittag::Config;
 use Mittag::DB::Schema;
+use Mittag::Offers;
 
 
 has config => sub {
@@ -17,6 +18,11 @@ has config => sub {
 has schema => sub {
     my ($self) = @_;
     Mittag::DB::Schema->connect_with_config($self->config);
+};
+
+has offers => sub {
+    my ($self) = @_;
+    Mittag::Offers->new(app => $self);
 };
 
 
@@ -60,6 +66,7 @@ sub startup {
     $r->get('/day/today')->to('day#date')->name('today');
 
     $r->get('/places/:id')->to('place#show');
+    $r->get('/places/:id/day/:date')->to('place#show');
 
     $r->get('/appointments')->to('appointment#index');
     $r->get('/appointments/new')->to('appointment#form');

@@ -31,6 +31,10 @@ $(document).ready(function() { // FIXME: couldn't make pageinit work
         map: map,
     });
 
+    $('#map_canvas').closest('div[data-role=collapsible]').bind('expand', function(){
+        setTimeout(resizeMap, 100);
+    });
+
     resizeMap();
 });
 	</script>
@@ -40,19 +44,30 @@ $(document).ready(function() { // FIXME: couldn't make pageinit work
 <div id="page" data-role="page">
 
 	<div id="header" data-role="header">
-	    <a href="/" data-icon="back" data-iconpos="notext" data-direction="reverse">Back</a>
+	    <a href="javascript://back" data-icon="back" data-iconpos="notext" data-rel="back">Back</a>
 		<h1><%= $place->name %></h1>
 	</div>
 
     <div id="content" data-role="content">
 
         <div data-role="collapsible-set">
-            <div data-role="collapsible" data-collapsed="false">
+            <div data-role="collapsible" data-content-theme="c" data-collapsed="false">
+% if ($date && @$offers) {
+                <h2>Menü am <%= $date->dmy('.') %></h2>
+                <ul data-role="listview">
+%   foreach my $offer (@$offers) {
+%=    include 'offer/_item', offer => $offer
+%   }
+                </ul>
+            </div>
+
+            <div data-role="collapsible" data-content-theme="c">
+% }
                 <h2>Karte</h2>
                 <div id="map_canvas"></div>
             </div>
 
-            <div data-role="collapsible">
+            <div data-role="collapsible" data-content-theme="c">
                 <h2>Daten</h2>
 % my $address = Mojo::ByteStream->new($place->address)->trim->html_escape;
 % $address =~ s{\n}{<br/>}gmsx;

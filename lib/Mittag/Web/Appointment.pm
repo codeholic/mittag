@@ -83,6 +83,10 @@ sub show {
             place  => $place,
             exists => $own_votes{$place->id},
             total  => $total_votes{$place->id} // 0,
+            offers => scalar($self->app->offers->search({
+                date     => $appointment->date,
+                place_id => $place->id,
+            })),
         };
     }
 

@@ -29,14 +29,18 @@ $('#<%= $page_id %>').one('pageinit', function(){
   <div data-role="content">
     <ul data-role="listview">
 % foreach my $entry (@$entries) {
-      <li>
-        <form action="/appointments/<%= $appointment->id %>/votes/<%= $entry->{place}->id . ( $entry->{exists} ? '/delete' : '' ) %>" data-ajax="false" method="post">
-          <label>
-            <input type="checkbox"<% if ($entry->{exists}) { %> checked="checked"<% } %>/>
-            <%= $entry->{place}->name %>
-          </label>
-          <span class="ui-li-count"><%= $entry->{total} %></span>
-        </form>
+      <li<% if ($entry->{offers}) { %> data-theme="e"<% } %>>
+        <a href="/places/<%= $entry->{place}->id %>/day/<%= $appointment->date->ymd('-') %>" rel="external">
+          <form action="/appointments/<%= $appointment->id %>/votes/<%= $entry->{place}->id . ( $entry->{exists} ? '/delete' : '' ) %>" data-ajax="false" method="post">
+            <fieldset data-role="controlgroup" data-type="horizontal">
+              <label>
+                <input type="checkbox"<% if ($entry->{exists}) { %> checked="checked"<% } %>"/>
+                <%= $entry->{place}->name %>
+              </label>
+            </fieldset>
+            <span class="ui-li-count"><%= $entry->{total} %></span>
+          </form>
+        </a>
       </li>
 % }
     </ul>
