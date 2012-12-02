@@ -4,14 +4,19 @@
   <script>
 $('#appointment').live('pageinit', function(){
   $('input[type=checkbox]').click(function(){
+    var checkbox = $(this);
     var form = $(this).closest('form');
     var action = form.attr('action');
-    $.post(action, form.serialize(), function(){
+    $(this).checkboxradio('disable');
+
+    $.post(action, form.serialize(), function(data){
       var newAction = action.replace(/\/delete$/, '');
       if (newAction == action) {
         newAction += '/delete';
       }
+      form.find('.ui-li-count').text(data['total']);
       form.attr('action', newAction);
+      checkbox.checkboxradio('enable');
     });
   });
 });
@@ -29,6 +34,7 @@ $('#appointment').live('pageinit', function(){
             <input type="checkbox"<% if ($entry->{exists}) { %> checked="checked"<% } %>/>
             <%= $entry->{place}->name %>
           </label>
+          <span class="ui-li-count"><%= $entry->{total} %></span>
         </form>
       </li>
 % }

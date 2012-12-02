@@ -59,15 +59,27 @@ sub show {
 
     my @places = sort { $a->name cmp $b->name } Mittag::Places->all;
 
-    my %own_votes = map { $_->place_id => 1 } $appointment->search_related(votes => {
-        user_id => $current_user->id,
-    });
+    my %own_votes = map { $_->place_id => 1 }
+        $appointment->search_related(votes => {
+            user_id => $current_user->id,
+        });
+
+    my %total_votes = map { $_->place_id => $_->get_column('total') }
+        $appointment->search_related(votes =>
+            undef,
+            {
+                '+select'  => [ { count => 'me.user_id' } ],
+                '+as'      => [ 'total' ],
+                'group_by' => [ 'place_id' ],
+            }
+        );
 
     my @entries;
     foreach my $place (@places) {
         push @entries, {
             place  => $place,
             exists => $own_votes{$place->id},
+            total  => $total_votes{$place->id} // 0,
         };
     }
 
@@ -101,8 +113,12 @@ sub vote {
         place_id => $place->id,
     });
 
-    $self->res->code(204);
-    $self->render(text => '');
+    my $total = $appointment->search_related(votes => {
+            place_id => $place->id,
+        })->count;
+
+    $self->res->code(200);
+    $self->render(json => { total => 0+ $total });
 }
 
 sub unvote {
@@ -129,8 +145,12 @@ sub unvote {
         place_id => $place->id,
     });
 
-    $self->res->code(204);
-    $self->render(text => '');
+    my $total = $appointment->search_related(votes => {
+            place_id => $place->id,
+        })->count;
+
+    $self->res->code(200);
+    $self->render(json => { total => 0+ $total });
 }
 
 1;
