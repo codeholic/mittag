@@ -68,10 +68,11 @@ sub startup {
     $r->get('/places/:id')->to('place#show');
     $r->get('/places/:id/day/:date')->to('place#show');
 
+    $r->get('/invites/:invite_code')->to('appointment#join');
+
     $r->get('/appointments')->to('appointment#index');
     $r->get('/appointments/new')->to('appointment#form');
     $r->post('/appointments')->to('appointment#create');
-    $r->get('/appointments/:id/join/:invite_code')->to('appointment#join');
     $r->get('/appointments/:id')->to('appointment#show');
     $r->post('/appointments/:id/votes/:place_id')->to('appointment#vote');
     $r->post('/appointments/:id/votes/:place_id/delete')->to('appointment#unvote');

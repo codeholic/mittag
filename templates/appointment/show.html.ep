@@ -27,6 +27,12 @@ $('#<%= $page_id %>').one('pageinit', function(){
     <h1><%= $title %></h1>
   </div>
   <div data-role="content">
+    <p>
+      Teile den Link, um Leute dazu einzuladen<br/>
+% my $url = url_for->path('/invites/' . $appointment->invite_code)->to_abs;
+      <a href="<%= $url %>"><%= $url %></a>
+    </p>
+
     <ul data-role="listview" data-inset="true">
 % foreach my $entry (@$entries) {
       <li data-theme="b">

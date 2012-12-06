@@ -46,7 +46,6 @@ sub join {
 
     if (!$self->appointment) {
         $self->appointment($self->app->rs('Appointment')->single({
-            id          => $self->param('id'),
             invite_code => $self->param('invite_code'),
         }));
     }
