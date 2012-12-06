@@ -34,12 +34,39 @@ sub form {
 sub create {
     my ($self) = @_;
 
-    my $appointment = $self->app->rs('Appointment')->create({
+    $self->appointment($self->app->rs('Appointment')->create({
         date => $self->param('date'),
+    }));
+
+    return $self->join;
+}
+
+sub join {
+    my ($self) = @_;
+
+    if (!$self->appointment) {
+        $self->appointment($self->app->rs('Appointment')->single({
+            id          => $self->param('id'),
+            invite_code => $self->param('invite_code'),
+        }));
+    }
+
+    if (!$self->appointment) {
+        return $self->render_not_found;
+    }
+
+    if (!$self->is_user_authenticated) {
+        $self->authenticate;
+    }
+
+    my $current_user = $self->current_user;
+
+    $self->appointment->find_or_create_related(participations => {
+        user => $current_user,
     });
 
     $self->res->code(303);
-    $self->redirect_to('/appointments/' . $appointment->id);
+    $self->redirect_to('/appointments/' . $self->appointment->id);
 }
 
 sub show {
@@ -56,9 +83,12 @@ sub show {
 
     my $current_user = $self->current_user;
 
-    $appointment->find_or_create_related(participations => {
+    my $participation = $appointment->find_related(participations => {
         user => $current_user,
     });
+    if (!$participation) {
+        return $self->render_not_found;
+    }
 
     my @places = sort { $a->name cmp $b->name } Mittag::Places->all;
 
@@ -83,10 +113,10 @@ sub show {
             place  => $place,
             exists => $own_votes{$place->id},
             total  => $total_votes{$place->id} // 0,
-            offers => scalar($self->app->offers->search({
+            offers => [ $self->app->offers->search({
                 date     => $appointment->date,
                 place_id => $place->id,
-            })),
+            }) ],
         };
     }
 

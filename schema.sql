@@ -24,19 +24,20 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `appointment` (
-  `id` varchar(25) NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `date` date NOT NULL,
+  `invite_code` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `participation` (
   `user_id` int(10) unsigned NOT NULL,
-  `appointment_id` varchar(25) NOT NULL,
+  `appointment_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`user_id`, `appointment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `vote` (
-  `appointment_id` varchar(25) NOT NULL,
+  `appointment_id` int(10) unsigned NOT NULL,
   `place_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`appointment_id`, `place_id`, `user_id`),

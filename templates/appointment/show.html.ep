@@ -27,21 +27,23 @@ $('#<%= $page_id %>').one('pageinit', function(){
     <h1><%= $title %></h1>
   </div>
   <div data-role="content">
-    <ul data-role="listview">
+    <ul data-role="listview" data-inset="true">
 % foreach my $entry (@$entries) {
-      <li<% if ($entry->{offers}) { %> data-theme="e"<% } %>>
-        <a href="/places/<%= $entry->{place}->id %>/day/<%= $appointment->date->ymd('-') %>" rel="external">
-          <form action="/appointments/<%= $appointment->id %>/votes/<%= $entry->{place}->id . ( $entry->{exists} ? '/delete' : '' ) %>" data-ajax="false" method="post">
-            <fieldset data-role="controlgroup" data-type="horizontal">
-              <label>
-                <input type="checkbox"<% if ($entry->{exists}) { %> checked="checked"<% } %>"/>
-                <%= $entry->{place}->name %>
-              </label>
-            </fieldset>
-            <span class="ui-li-count"><%= $entry->{total} %></span>
-          </form>
-        </a>
+      <li data-theme="b">
+        <form action="/appointments/<%= $appointment->id %>/votes/<%= $entry->{place}->id . ( $entry->{exists} ? '/delete' : '' ) %>" data-ajax="false" method="post">
+          <div data-role="controlgroup" data-type="horizontal" data-mini="true">
+            <label>
+              <input type="checkbox"<% if ($entry->{exists}) { %> checked="checked"<% } %>"/>
+              <%= $entry->{place}->name %>
+            </label>
+            <a href="/places/<%= $entry->{place}->id %>/day/<%= $appointment->date->ymd('-') %>" data-role="button" data-icon="info" data-iconpos="notext" rel="external">Info</a>
+          </div>
+          <span class="ui-li-count"><%= $entry->{total} %></span>
+        </form>
       </li>
+%   foreach my $offer (@{$entry->{offers}}) {
+%=    include 'offer/_item', offer => $offer
+%   }
 % }
     </ul>
   </div>

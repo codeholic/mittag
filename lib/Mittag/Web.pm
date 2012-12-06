@@ -71,6 +71,7 @@ sub startup {
     $r->get('/appointments')->to('appointment#index');
     $r->get('/appointments/new')->to('appointment#form');
     $r->post('/appointments')->to('appointment#create');
+    $r->get('/appointments/:id/join/:invite_code')->to('appointment#join');
     $r->get('/appointments/:id')->to('appointment#show');
     $r->post('/appointments/:id/votes/:place_id')->to('appointment#vote');
     $r->post('/appointments/:id/votes/:place_id/delete')->to('appointment#unvote');
