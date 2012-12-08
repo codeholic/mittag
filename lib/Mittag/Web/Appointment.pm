@@ -2,12 +2,31 @@ package Mittag::Web::Appointment;
 
 use Mojo::Base 'Mojolicious::Controller';
 
+use Class::Method::Modifiers;
 use DateTime;
 
 use Mittag::Places;
 
-has 'appointment';
-has 'place';
+has 'appointment' => sub {
+    my ($self) = @_;
+    return $self->app->rs('Appointment')->find($self->param('id'));
+};
+
+has 'place' => sub {
+    my ($self) = @_;
+    return Mittag::Places->place_by_id($self->param('place_id'))
+};
+
+has 'count_votes' => sub {
+    my ($self) = @_;
+    return $self->appointment->count_related(votes => {
+        place_id => $self->place->id,
+    });
+};
+
+around [ qw{ create join vote unvote } ] => \&_assert_current_user;
+around [ qw{ _join show vote unvote } ] => \&_assert_appointment;
+around [ qw{ vote unvote } ] => \&_assert_place;
 
 sub index {
     my ($self) = @_;
@@ -38,25 +57,43 @@ sub create {
         date => $self->param('date'),
     }));
 
-    return $self->join;
+    return $self->_join;
 }
 
 sub join {
     my ($self) = @_;
 
-    if (!$self->appointment) {
-        $self->appointment($self->app->rs('Appointment')->single({
-            invite_code => $self->param('invite_code'),
-        }));
-    }
+    $self->appointment($self->app->rs('Appointment')->single({
+        invite_code => $self->param('invite_code'),
+    }));
+
+    return $self->_join;
+}
+
+sub _assert_appointment {
+    my $orig = shift;
+    my $self = shift;
 
     if (!$self->appointment) {
         return $self->render_not_found;
     }
 
+    return $orig->($self);
+}
+
+sub _assert_current_user {
+    my $orig = shift;
+    my $self = shift;
+
     if (!$self->is_user_authenticated) {
         $self->authenticate;
     }
+
+    return $orig->($self);
+}
+
+sub _join {
+    my ($self) = @_;
 
     my $current_user = $self->current_user;
 
@@ -71,18 +108,9 @@ sub join {
 sub show {
     my ($self) = @_;
 
-    my $appointment = $self->app->rs('Appointment')->find($self->param('id'));
-    if (!$appointment) {
-        return $self->render_not_found;
-    }
-
-    if (!$self->is_user_authenticated) {
-        $self->authenticate;
-    }
-
     my $current_user = $self->current_user;
 
-    my $participation = $appointment->find_related(participations => {
+    my $participation = $self->appointment->find_related(participations => {
         user => $current_user,
     });
     if (!$participation) {
@@ -92,12 +120,12 @@ sub show {
     my @places = sort { $a->name cmp $b->name } Mittag::Places->all;
 
     my %own_votes = map { $_->place_id => 1 }
-        $appointment->search_related(votes => {
+        $self->appointment->search_related(votes => {
             user_id => $current_user->id,
         });
 
     my %total_votes = map { $_->place_id => $_->get_column('total') }
-        $appointment->search_related(votes =>
+        $self->appointment->search_related(votes =>
             undef,
             {
                 '+select'  => [ { count => 'me.user_id' } ],
@@ -113,14 +141,14 @@ sub show {
             exists => $own_votes{$place->id},
             total  => $total_votes{$place->id} // 0,
             offers => [ $self->app->offers->search({
-                date     => $appointment->date,
+                date     => $self->appointment->date,
                 place_id => $place->id,
             }) ],
         };
     }
 
     $self->stash(
-        appointment => $appointment,
+        appointment => $self->appointment,
         entries     => \@entries,
     );
 }
@@ -128,54 +156,34 @@ sub show {
 sub vote {
     my ($self) = @_;
 
-    $self->_toggle_vote(sub {
-        $self->appointment->find_or_create_related(votes => {
-            user     => $self->current_user,
-            place_id => $self->place->id,
-        });
+    $self->appointment->find_or_create_related(votes => {
+        user     => $self->current_user,
+        place_id => $self->place->id,
     });
 
-    return;
+    $self->render(json => { count_votes => $self->count_votes });
 }
 
 sub unvote {
     my ($self) = @_;
 
-    $self->_toggle_vote(sub {
-        $self->appointment->delete_related(votes => {
-            user_id  => $self->current_user->id,
-            place_id => $self->place->id,
-        });
+    $self->appointment->delete_related(votes => {
+        user_id  => $self->current_user->id,
+        place_id => $self->place->id,
     });
 
-    return;
+    $self->render(json => { count_votes => $self->count_votes });
 }
 
-sub _toggle_vote {
-    my ($self, $cb) = @_;
+sub _assert_place {
+    my $orig = shift;
+    my $self = shift;
 
-    $self->place(Mittag::Places->place_by_id($self->param('place_id')));
     if (!$self->place) {
         return $self->render_not_found;
     }
 
-    $self->appointment($self->app->rs('Appointment')->find($self->param('id')));
-    if (!$self->appointment) {
-        return $self->render_not_found;
-    }
-
-    if (!$self->is_user_authenticated) {
-        $self->authenticate;
-    }
-
-    $cb->();
-
-    my $total = $self->appointment->search_related(votes => {
-            place_id => $self->place->id,
-        })->count;
-
-    $self->res->code(200);
-    $self->render(json => { total => 0+ $total });
+    $orig->($self);
 }
 
 1;

@@ -15,7 +15,7 @@ $('#<%= $page_id %>').one('pageinit', function(){
       if (newAction == action) {
         newAction += '/delete';
       }
-      form.find('.ui-li-count').text(data['total']);
+      form.find('.ui-li-count').text(data['count_votes']);
       form.attr('action', newAction);
       checkbox.checkboxradio('enable');
     });
