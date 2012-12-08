@@ -26,16 +26,18 @@ $('#<%= $page_id %>').one('pageinit', function(){
     <a href="/appointments" data-role="button" data-icon="back" data-iconpos="notext" data-transition="slide" data-direction="reverse">Zurück</a>
     <h1><%= $title %></h1>
   </div>
-  <div data-role="content">
+  <div class="ui-bar ui-bar-e">
     <p>
-      Teile den Link, um Leute dazu einzuladen<br/>
+      Teile den Link, um Leute hierzu einzuladen<br/>
 % my $url = url_for->path('/invites/' . $appointment->invite_code)->to_abs;
       <a href="<%= $url %>"><%= $url %></a>
     </p>
+  </div>
+  <div data-role="content">
 
-    <ul data-role="listview" data-inset="true">
+    <ul data-role="listview">
 % foreach my $entry (@$entries) {
-      <li data-theme="b">
+      <li data-theme="d">
         <form action="/appointments/<%= $appointment->id %>/votes/<%= $entry->{place}->id . ( $entry->{exists} ? '/delete' : '' ) %>" data-ajax="false" method="post">
           <div data-role="controlgroup" data-type="horizontal" data-mini="true">
             <label>
