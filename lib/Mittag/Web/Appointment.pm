@@ -17,13 +17,6 @@ has 'place' => sub {
     return Mittag::Places->place_by_id($self->param('place_id'))
 };
 
-has 'count_votes' => sub {
-    my ($self) = @_;
-    return $self->appointment->count_related(votes => {
-        place_id => $self->place->id,
-    });
-};
-
 around [ qw{ create join vote unvote } ] => \&_assert_current_user;
 around [ qw{ _join show vote unvote } ] => \&_assert_appointment;
 around [ qw{ vote unvote } ] => \&_assert_place;
@@ -161,7 +154,7 @@ sub vote {
         place_id => $self->place->id,
     });
 
-    $self->render(json => { count_votes => $self->count_votes });
+    $self->_render_votes;
 }
 
 sub unvote {
@@ -172,7 +165,7 @@ sub unvote {
         place_id => $self->place->id,
     });
 
-    $self->render(json => { count_votes => $self->count_votes });
+    $self->_render_votes;
 }
 
 sub _assert_place {
@@ -184,6 +177,14 @@ sub _assert_place {
     }
 
     $orig->($self);
+}
+
+sub _render_votes {
+    my ($self) = @_;
+    my $count_votes = $self->appointment->count_related(votes => {
+        place_id => $self->place->id,
+    });
+    $self->render(json => { count_votes => $count_votes });
 }
 
 1;
